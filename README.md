@@ -9,7 +9,7 @@ pila is different.
 
 Here's a factorial macro:
 
-    :fac dup 0 = #(pop 1) #(dup 1 - fac *) if
+    :fac dup 0 = #(dup 1 - fac *) #(pop 1) if
     
 Here's how you use it:
 

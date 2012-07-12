@@ -9,7 +9,6 @@ List peek := method(self last)
 Sequence asBool := method(if(self asLowercase == "true", true, false))
 
 stack := list()
-locals := list()
 builtins := Map clone
 macros := Map clone
 
@@ -46,16 +45,13 @@ initialize := method(
   builtins atPut("&", block(a := stack pop; b := stack pop; stack push(a and b)))
   builtins atPut("|", block(a := stack pop; b := stack pop; stack push(a or b)))
   builtins atPut("if", block(
-    2 repeat(locals push(stack pop))
-    //writeln("  DEBUG: locals = #{locals}" interpolate)
+    then := stack pop
+    else := stack pop
     if(stack pop, 
-      run_input(locals pop)
-      locals pop
+      run_input(then)
       , 
-      locals pop
-      run_input(locals pop)
+      run_input(else)
     )
-    
   ))
   builtins atPut("nop", block())
   builtins atPut("call", block(run_input(stack pop)))  
@@ -158,9 +154,6 @@ run_input := method(input,
   ilist foreach(word,
     run(word)
   )
-  
-  // clear locals
-  locals = list()
 )
 
 start := method(
