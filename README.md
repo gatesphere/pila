@@ -25,6 +25,19 @@ And an example:
     [0]> 6 fib .
     13
 
+String manipulation can be neat too:
+  
+    $ ./pila.io
+    pila 20120712
+    [0]> "foo" "bar" + .
+    "foobar"
+    [1]> "baz" 3 * ...
+    ["foobar", "bazbazbaz"]<=
+    [2]> + .
+    "foobarbazbazbaz"
+    [1]> $bye
+    goodbye  
+
 Documentation
 -------------
 **Concepts**
@@ -50,6 +63,9 @@ pila recognizes and works with 3 distinct data types, which is really all you ne
 pila will work with numbers (integers and floating point, autoconverted on the fly),
 character strings (surrounded with `"` characters), and boolean values (`true` and
 `false`).
+
+pila is also smart when it comes to types: `+` and `*` change their behavior when
+appropriate to work on numbers and strings! 
 
 **Builtins**
 TBD.

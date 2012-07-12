@@ -7,11 +7,15 @@
 DEBUG_OUTPUT := false
 VERSION := "20120712"
 
+// Override Io's behavior a bit
 List asString := method("[" .. self join(", ") .. "]<=")
 List peek := method(self last)
 List oldPush := List getSlot("push")
 List push := method(x, if(x != nil, self oldPush(x)))
 Sequence asBool := method(if(self asLowercase == "true", true, false))
+nil asString := ""
+true xor := method(x, if(x, false, true))
+false xor := method(x, if(x, true, false))
 
 stack := list()
 builtins := Map clone
@@ -57,11 +61,35 @@ initialize := method(
   builtins atPut("2nip", block(run_input("2swap 2pop")))
   builtins atPut("2tuck", block(run_input("2swap 2over"))) 
   
-  // arithmetic
-  builtins atPut("+", block(stack push(stack pop + stack pop)))
+  // arithmetic (and string manipulation)
+  builtins atPut("+", block(
+    b := stack pop
+    a := stack pop
+    if(a isKindOf(Sequence) or b isKindOf(Sequence),
+      a = a asString
+      b = b asString
+      if(is_string(a), a = unquote(a))
+      if(is_string(b), b = unquote(b))
+      stack push("\"" .. a .. b .. "\"")
+      ,
+      stack push(a + b)
+    )
+  ))
   builtins atPut("-", block(stack push(-(stack pop - stack pop))))
   builtins atPut("/", block(stack push(1/(stack pop / stack pop))))
-  builtins atPut("*", block(stack push(stack pop * stack pop)))
+  builtins atPut("*", block(
+    a := stack pop
+    b := stack pop
+    if((a isKindOf(Sequence) xor(b isKindOf(Sequence))) and
+       (a isKindOf(Number) xor(b isKindOf(Number))),
+       if(a isKindOf(Number), x := a; a = b; b = x)
+       x := ""
+       b repeat(x = x .. unquote(a))
+       stack push("\"" .. x .. "\"")
+       ,
+       stack push(a * b)
+    )
+  ))
   builtins atPut("%", block(a := stack pop; b := stack pop; stack push(b % a)))
   builtins atPut("<<", block(a := stack pop; b := stack pop; stack push(b << a)))
   builtins atPut(">>", block(a := stack pop; b := stack pop; stack push(b >> a)))
@@ -104,7 +132,6 @@ initialize := method(
     )
   ))
 )
-
 
 get_input := method(
   write("[#{stack size}]> " interpolate)
