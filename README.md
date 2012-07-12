@@ -85,7 +85,7 @@ BSD.  See [license/license.txt](https://raw.github.com/gatesphere/pila/master/li
 To do
 -----
   * Add ReadLine support.
-  * More stack manip builtins (rot, -rot, 2dup, over, etc.)
+  * Catch exceptions/nil values
   * Add script file support. (std lib?)
   * Add hex, octal, binary support for numbers
   * Fix string parsing code

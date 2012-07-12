@@ -9,6 +9,8 @@ VERSION := "20120712"
 
 List asString := method("[" .. self join(", ") .. "]<=")
 List peek := method(self last)
+List oldPush := List getSlot("push")
+List push := method(x, if(x != nil, self oldPush(x)))
 Sequence asBool := method(if(self asLowercase == "true", true, false))
 
 stack := list()
@@ -26,12 +28,36 @@ unmacro := method(x, x exSlice(2))
 unanonmacro := method(x, x exSlice(2, x size - 1))
 
 initialize := method(
+  // printing
   builtins atPut(".", block(writeln(stack peek)))
   builtins atPut("...", block(writeln(stack)))
+  
+  // stack manip
   builtins atPut("dup", block(stack push(stack peek)))
   builtins atPut("cls", block(stack = list()))
   builtins atPut("pop", block(stack pop))
   builtins atPut("swap", block(a := stack pop; b := stack pop; stack push(a); stack push(b)))
+  builtins atPut("rot", block(a := stack pop; b := stack pop; c := stack pop; stack push(b); stack push(a); stack push(c)))
+  builtins atPut("-rot", block(run_input("rot rot")))
+  builtins atPut("over", block(stack push(stack at(stack size - 2))))
+  builtins atPut("nip", block(run_input("swap pop")))
+  builtins atPut("tuck", block(run_input("swap over")))
+  builtins atPut("2dup", block(run_input("over over")))
+  builtins atPut("2pop", block(run_input("pop pop")))
+  builtins atPut("2swap", block(
+    a := stack pop; b := stack pop; c := stack pop; d := stack pop
+    stack push(b); stack push(a); stack push(d); stack push(c)
+  ))
+  builtins atPut("2rot", block(
+    a := stack pop; b := stack pop; c := stack pop; d := stack pop; e := stack pop; f := stack pop
+    stack push(d); stack push(c); stack push(b); stack push(a); stack push(f); stack push(e)
+  ))
+  builtins atPut("2-rot", block(run_input("2rot 2rot")))
+  builtins atPut("2over", block(2 repeat(stack push(stack at(stack size - 4)))))
+  builtins atPut("2nip", block(run_input("2swap 2pop")))
+  builtins atPut("2tuck", block(run_input("2swap 2over"))) 
+  
+  // arithmetic
   builtins atPut("+", block(stack push(stack pop + stack pop)))
   builtins atPut("-", block(stack push(-(stack pop - stack pop))))
   builtins atPut("/", block(stack push(1/(stack pop / stack pop))))
@@ -39,6 +65,8 @@ initialize := method(
   builtins atPut("%", block(a := stack pop; b := stack pop; stack push(b % a)))
   builtins atPut("<<", block(a := stack pop; b := stack pop; stack push(b << a)))
   builtins atPut(">>", block(a := stack pop; b := stack pop; stack push(b >> a)))
+  
+  // boolean logic
   builtins atPut("=", block(stack push(stack pop == stack pop)))
   builtins atPut("<", block(stack push(stack pop > stack pop)))
   builtins atPut(">", block(stack push(stack pop < stack pop)))
@@ -47,6 +75,8 @@ initialize := method(
   builtins atPut("!", block(stack push(stack pop not)))
   builtins atPut("&", block(a := stack pop; b := stack pop; stack push(a and b)))
   builtins atPut("|", block(a := stack pop; b := stack pop; stack push(a or b)))
+  
+  // flow control
   builtins atPut("if", block(
     then := stack pop
     else := stack pop
@@ -60,9 +90,19 @@ initialize := method(
       run_input(else)
     )
   ))
+  
+  // direct calls
   builtins atPut("nop", block())
-  builtins atPut("call", block(run_input(stack pop)))  
-  builtins atPut("bye", block(writeln("goodbye"); System exit))
+  builtins atPut("call", block(run_input(stack pop))) 
+  
+  // meta 
+  builtins atPut("$bye", block(writeln("goodbye"); System exit))
+  builtins atPut("$macros", block(
+    writeln("registered macros:")
+    macros keys foreach(key,
+      writeln("#{key} := #{macros at(key)}" interpolate)
+    )
+  ))
 )
 
 
