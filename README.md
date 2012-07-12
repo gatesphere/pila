@@ -15,6 +15,15 @@ Here's how you use it:
 
     [0]> 6 fac .
     720
+    
+Here's a Fibonacci calculator:
+
+    :fib dup 1 <= #(1 - dup fib swap 1 - fib +) #(pop 1) if
+    
+And an example:
+    
+    [0]> 6 fib .
+    13
 
 Documentation
 -------------
@@ -38,7 +47,7 @@ you can significantly reduce the cognitive burden on yourself when writing progr
 
 **Data types**
 pila recognizes and works with 3 distinct data types, which is really all you need.
-pila will work with numbers (integers and floating point, autoboxed on the fly),
+pila will work with numbers (integers and floating point, autoconverted on the fly),
 character strings (surrounded with `"` characters), and boolean values (`true` and
 `false`).
 
@@ -76,7 +85,10 @@ BSD.  See [license/license.txt](https://raw.github.com/gatesphere/pila/master/li
 To do
 -----
   * Add ReadLine support.
+  * More stack manip builtins (rot, -rot, 2dup, over, etc.)
   * Add script file support. (std lib?)
+  * Add hex, octal, binary support for numbers
+  * Fix string parsing code
   * Clean it all up.
   * Documentation
   * File I/O?

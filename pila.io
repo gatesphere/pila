@@ -4,7 +4,10 @@
 // 20120711
 // Jacob Peck
 
-List asString := method("bottom [" .. self join(", ") .. "] top")
+DEBUG_OUTPUT := false
+VERSION := "20120712"
+
+List asString := method("[" .. self join(", ") .. "]<=")
 List peek := method(self last)
 Sequence asBool := method(if(self asLowercase == "true", true, false))
 
@@ -12,7 +15,7 @@ stack := list()
 builtins := Map clone
 macros := Map clone
 
-is_num := method(x, x asNumber isNan not)
+is_num := method(x, n := x asNumber; n isNan not and n asString == x)
 is_bool := method(x, x asLowercase == "true" or x asLowercase == "false")
 is_macro := method(x,x beginsWithSeq("##"))
 is_anonmacro := method(x, x beginsWithSeq("#(") and x endsWithSeq(")"))
@@ -47,9 +50,13 @@ initialize := method(
   builtins atPut("if", block(
     then := stack pop
     else := stack pop
-    if(stack pop, 
+    if(DEBUG_OUTPUT, writeln("  DEBUG: if > then = #{then}" interpolate))
+    if(DEBUG_OUTPUT, writeln("  DEBUG: if > else = #{else}" interpolate))
+    if(stack pop,
+      if(DEBUG_OUTPUT, writeln("  DEBUG: if > taking then branch"))
       run_input(then)
-      , 
+      ,
+      if(DEBUG_OUTPUT, writeln("  DEBUG: if > taking else branch")) 
       run_input(else)
     )
   ))
@@ -65,7 +72,7 @@ get_input := method(
 )
 
 run := method(word,
-  // check for builtin
+  if(DEBUG_OUTPUT, writeln("    DEBUG: running word #{word} > stack = #{stack}" interpolate))
   if(builtins keys contains(word asLowercase),
     builtins at(word) call
     ,
@@ -98,7 +105,7 @@ run := method(word,
 )
 
 run_input := method(input,
-  //writeln("  DEBUG: stack = #{stack}" interpolate)
+  if(DEBUG_OUTPUT, writeln("  DEBUG: stack = #{stack}" interpolate))
   // check for macro
   if(input beginsWithSeq(":"),
     a := input exSlice(1) splitNoEmpties
@@ -128,7 +135,7 @@ run_input := method(input,
     return
   )
   
-  //writeln("  DEBUG: ilist = #{ilist}" interpolate)
+  if(DEBUG_OUTPUT, writeln("  DEBUG: ilist (anonmacro phase) = #{ilist}" interpolate))
   
   input = ilist
   ilist = list()
@@ -148,7 +155,7 @@ run_input := method(input,
     return
   )
   
-  //writeln("  DEBUG: ilist = #{ilist}" interpolate)
+  if(DEBUG_OUTPUT, writeln("  DEBUG: ilist (string phase) = #{ilist}" interpolate))
   
   // run each word
   ilist foreach(word,
@@ -157,7 +164,7 @@ run_input := method(input,
 )
 
 start := method(
-  writeln("pila 20120711")
+  writeln("pila #{VERSION}" interpolate)
   initialize
   loop(
     run_input(get_input)
