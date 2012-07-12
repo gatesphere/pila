@@ -4,6 +4,7 @@
 // 20120711
 // Jacob Peck
 
+// control variables
 DEBUG_OUTPUT := false
 VERSION := "20120712"
 
@@ -17,20 +18,26 @@ nil asString := ""
 true xor := method(x, if(x, false, true))
 false xor := method(x, if(x, true, false))
 
+// internals
 stack := list()
 builtins := Map clone
 macros := Map clone
+running := true
+rl := ReadLine
 
+// helper methods
 is_num := method(x, n := x asNumber; n isNan not and n asString == x)
 is_bool := method(x, x asLowercase == "true" or x asLowercase == "false")
 is_macro := method(x,x beginsWithSeq("##"))
 is_anonmacro := method(x, x beginsWithSeq("#(") and x endsWithSeq(")"))
 is_string := method(x, x beginsWithSeq("\"") and x endsWithSeq("\""))
-
 unquote := method(x, x exSlice(1, x size - 1))
 unmacro := method(x, x exSlice(2))
 unanonmacro := method(x, x exSlice(2, x size - 1))
+load_history := method(try(rl loadHistory(".pila_history")))
+save_history := method(try(rl saveHistory(".pila_history")))
 
+// set up builtins
 initialize := method(
   // printing
   builtins atPut(".", block(writeln(stack peek)))
@@ -124,7 +131,7 @@ initialize := method(
   builtins atPut("call", block(run_input(stack pop))) 
   
   // meta 
-  builtins atPut("$bye", block(writeln("goodbye"); System exit))
+  builtins atPut("$bye", block(writeln("goodbye"); running = false))
   builtins atPut("$macros", block(
     writeln("registered macros:")
     macros keys foreach(key,
@@ -133,10 +140,14 @@ initialize := method(
   ))
 )
 
+// prompt and read input
 get_input := method(
-  write("[#{stack size}]> " interpolate)
-  File standardInput readLine
+  rl prompt = "[#{stack size}]> " interpolate
+  l := rl readLine(rl prompt)
+  rl addHistory(l)
+  l
 )
+
 
 run := method(word,
   if(DEBUG_OUTPUT, writeln("    DEBUG: running word #{word} > stack = #{stack}" interpolate))
@@ -233,9 +244,12 @@ run_input := method(input,
 start := method(
   writeln("pila #{VERSION}" interpolate)
   initialize
-  loop(
+  load_history
+  while(running,
     run_input(get_input)
   )
+  save_history
+  System exit
 )
 
 start

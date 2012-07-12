@@ -100,7 +100,6 @@ BSD.  See [license/license.txt](https://raw.github.com/gatesphere/pila/master/li
 
 To do
 -----
-  * Add ReadLine support.
   * Catch exceptions/nil values
   * Add script file support. (std lib?)
   * Add hex, octal, binary support for numbers
