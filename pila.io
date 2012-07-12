@@ -72,9 +72,9 @@ initialize := method(
   builtins atPut(">", block(stack push(stack pop < stack pop)))
   builtins atPut("<=", block(stack push(stack pop >= stack pop)))
   builtins atPut(">=", block(stack push(stack pop <= stack pop)))
-  builtins atPut("!", block(stack push(stack pop not)))
-  builtins atPut("&", block(a := stack pop; b := stack pop; stack push(a and b)))
-  builtins atPut("|", block(a := stack pop; b := stack pop; stack push(a or b)))
+  builtins atPut("not", block(stack push(stack pop not)))
+  builtins atPut("and", block(a := stack pop; b := stack pop; stack push(a and b)))
+  builtins atPut("or", block(a := stack pop; b := stack pop; stack push(a or b)))
   
   // flow control
   builtins atPut("if", block(
