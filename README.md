@@ -14,7 +14,7 @@ Here's a factorial macro:
 Here's how you use it:
 
     [0]> 6 fac .
-    120
+    720
 
 Documentation
 -------------
