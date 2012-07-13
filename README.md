@@ -83,12 +83,61 @@ pila is also smart when it comes to types: `+` and `*` change their behavior whe
 appropriate to work on numbers and strings! 
 
 **Running pila**
-TBD.
+pila is easy to run, but it requires [Io](http://iolanguage.com/).  To begin a pila session, simply do:
+
+    ./pila.io
+    
+To run a script file, do:
+
+    ./pila.io somescript.pila
 
 **Builtins**
-TBD.
+The following words are built in as a part of pila, and cannot be redefined:
 
-**Predefined macros**
+Word    | Description
+--------|------------
+.       | Print the top of the stack.
+...     | Print the whole stack.
+dup     | Duplicate the top of the stack.
+cls     | Empty the stack completely.
+pop     | Discard the top of the stack.
+swap    | Exchange the first two items of the stack.
+rot     | Move the third item in the stack to the top of the stack.
+-rot    | Move the top of the stack into the third position.
+over    | Push a copy of the second item in the stack to the top of the stack.
+nip     | Remove the second item in the stack.
+tuck    | Copy the top element of the stack to the third position.
+2dup    | Same as dup, but copies the top two elements.
+2pop    | Same as pop, but pops the top two elements.
+2swap   | Same as swap, but operates on pairs of elements.
+2rot    | Same as rot, but operates on pairs of elements.
+2-rot   | Same as -rot, but operates on pairs of elements.
+2over   | Same as over, but operates on pairs of elements.
+2nip    | Same as nip, but operates on pairs of elements.
+2tuck   | Same as tuck, but operates on pairs of elements.
++       | Pops the top two items and pushes their sum onto the stack.  If at least one of the elements is a string, + performs concatenation.
+-       | Pops the top two items and pushes their difference onto the stack.
+*       | Pops the top two items and pushes their product onto the stack.  If one of the elements is a string, * performs string multiplication.
+/       | Pops the top two items and pushes their quotient onto the stack.
+%       | Pops the top two items and pushes their modulo onto the stack.
+<<      | Pops the top two items (m, n) from the stack and pushes (m << n) to the stack.
+>>      | Pops the top two items (m, n) from the stack and pushes (m >> n) to the stack.
+=       | Pops the top two items from the stack and pushes true if they're equal, false otherwise.
+>       | Pops the top two items (m, n) from the stack and pushes true if m > n, false otherwise.
+<       | Pops the top two items (m, n) from the stack and pushes true if m < n, false otherwise.
+>=      | Pops the top two items (m, n) from the stack and pushes true if m >= n, false otherwise.
+<=      | Pops the top two items (m, n) from the stack and pushes true if m <= n, false otherwise.
+and     | Pops the top two items (m, n) from the stack and pushes true if (m && n) == true, false otherwise.
+or      | Pops the top two items (m, n) from the stack and pushes true if (m && n) == true, false otherwise.
+not     | Pops the top item (n) from the stack and pushes true if n == false, false otherwise.
+nop     | Does absolutely nothing (no operation).
+call    | Pops the top item from the stack and attempts to evaluates it as code.
+if      | Pops the top three items from the stack (c, t, e), and if c == true, evaluates t, otherwise evaluates e.
+$bye    | Exits the program.
+$macros | Lists defined macros.
+$import | Pops the top item (n) from the stack and reads in the script file whose name is n.
+
+**Predefined macros (Standard Library)**
 TBD.
 
 **Defining macros**

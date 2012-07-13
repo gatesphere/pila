@@ -1,0 +1,21 @@
+// pila standard lib
+
+// symbol aliases for builtins
+:! not
+:& and
+:| or
+
+// boolean logic tests
+:0= dup 0 =
+:0< dup 0 <
+:0> dup 0 >
+
+// math
+:avg + 2 /
+:min 2dup < #(nip) #(pop) if
+:max 2dup > #(nip) #(pop) if
+:++ 1 +
+:-- 1 -
+
+// looping construct
+:ntimes 0> #(pop) #(over call 1 - ntimes) if

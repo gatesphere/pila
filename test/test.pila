@@ -9,8 +9,8 @@
 // call a macro
 helloworld
 
-// push a macro reference
-##helloworld
+// push am anonmacro reference
+#(helloworld)
 
 // call a macro reference
 call

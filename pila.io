@@ -6,7 +6,7 @@
 
 // control variables
 DEBUG_OUTPUT := false
-VERSION := "20120712"
+VERSION := "20120713"
 
 // Override Io's behavior a bit
 List asString := method("[" .. self join(", ") .. "]<=")
@@ -189,6 +189,8 @@ run := method(word,
 
 run_input := method(input,
   if(input == nil, return)
+  input = input asString
+  
   if(DEBUG_OUTPUT, writeln("  DEBUG: stack = #{stack}" interpolate))
   // check for macro
   if(input beginsWithSeq(":"),
@@ -259,6 +261,7 @@ run_input := method(input,
     )
     e catch(
       writeln("  >> ERROR: Something went wrong.  Reverting stack to previous state.")
+      if(DEBUG_OUTPUT, writeln("  DEBUG: exception caught: #{e}" interpolate))
       stack = cachestack
       break
     )
@@ -268,11 +271,16 @@ run_input := method(input,
 start := method(
   writeln("pila #{VERSION}" interpolate)
   initialize
-  load_history
-  while(running,
-    run_input(get_input)
+  if(System args at(1) != nil,
+    run_input("\"" .. System args at(1) .. "\" $import")
+    
+    ,
+    load_history
+    while(running,
+      run_input(get_input)
+    )
+    save_history
   )
-  save_history
   System exit
 )
 
