@@ -5,7 +5,7 @@
 // Jacob Peck
 
 // control variables
-DEBUG_OUTPUT := false
+DEBUG_OUTPUT := true
 VERSION := "20120712"
 
 // Override Io's behavior a bit
@@ -17,6 +17,11 @@ Sequence asBool := method(if(self asLowercase == "true", true, false))
 nil asString := ""
 true xor := method(x, if(x, false, true))
 false xor := method(x, if(x, true, false))
+Object select := method( 
+  for(couple, 0, call argCount - 2, 2, 
+    if(call evalArgAt(couple), return call relayStopStatus(call evalArgAt(couple + 1)))
+  )
+)
 
 // internals
 stack := list()
@@ -135,9 +140,12 @@ initialize := method(
   builtins atPut("$macros", block(
     writeln("registered macros:")
     macros keys foreach(key,
-      writeln("#{key} := #{macros at(key)}" interpolate)
+      if(macros at(key) != true, writeln("#{key} := #{macros at(key)}" interpolate))
     )
   ))
+  
+  // add reference to macros for faster lookup
+  builtins keys foreach(key, macros atPut(key, true))
 )
 
 // prompt and read input
@@ -151,34 +159,21 @@ get_input := method(
 
 run := method(word,
   if(DEBUG_OUTPUT, writeln("    DEBUG: running word #{word} > stack = #{stack}" interpolate))
-  if(builtins keys contains(word asLowercase),
-    builtins at(word) call
-    ,
-    if(macros keys contains(word asLowercase),
-      run_input(macros at(word))
-      ,
-      if(is_num(word),
-        stack push(word asNumber)
-        ,
-        if(is_bool(word),
-          stack push(word asBool)
-          ,
-          if(is_macro(word),
-            stack push(unmacro(word))
-            ,
-            if(is_anonmacro(word),
-              stack push(unanonmacro(word))
-              ,
-              if(is_string(word),
-                stack push(word)
-                ,
-                writeln("  >> ERROR: Unknown word, ignoring: #{word}" interpolate)
-              )
-            )
-          )
-        )
-      )
-    )
+  select(
+    macros keys contains(word),
+      if(macros at(word) == true, builtins at(word) call, run_input(macros at(word))),
+    is_num(word),
+      stack push(word asNumber),
+    is_bool(word),
+      stack push(word asBool),
+    is_macro(word),
+      stack push(unmacro(word)),
+    is_anonmacro(word),
+      stack push(unanonmacro(word)),
+    is_string(word),
+      stack push(word),
+    word,
+      writeln("  >> ERROR: Unknown word, ignoring: #{word}" interpolate)
   )
 )
 
@@ -187,10 +182,19 @@ run_input := method(input,
   // check for macro
   if(input beginsWithSeq(":"),
     a := input exSlice(1) splitNoEmpties
+    if(builtins keys contains(a at(0)),
+      writeln("  >> ERROR: Cannot redefine builtin: #{a at(0)}" interpolate)
+      return
+    )
+    if(macros keys contains(a at(0)), 
+      writeln("  >> WARNING: Redefining macro: #{a at(0)}" interpolate)
+    )
     macros atPut(a at(0), a rest join(" "))
     return
   )
-    
+  
+  // discard comments
+  input = input split("//") at(0)
   
   // selectively split (preserve anonmacros and strings)
   // ugly and broken
@@ -236,9 +240,7 @@ run_input := method(input,
   if(DEBUG_OUTPUT, writeln("  DEBUG: ilist (string phase) = #{ilist}" interpolate))
   
   // run each word
-  ilist foreach(word,
-    run(word)
-  )
+  ilist foreach(word, run(word))
 )
 
 start := method(

@@ -94,6 +94,10 @@ TBD.
 **Script file support**
 TBD.
 
+**Comments**
+Comments are delimited by `//`.  Anything to the right of `//` to the end of a line
+is discarded and ignored by the parser.
+
 License
 -------
 BSD.  See [license/license.txt](https://raw.github.com/gatesphere/pila/master/license/license.txt) for details.
