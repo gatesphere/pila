@@ -12,7 +12,7 @@ VERSION := "20120712"
 List asString := method("[" .. self join(", ") .. "]<=")
 List peek := method(self last)
 List oldPush := List getSlot("push")
-List push := method(x, if(x != nil, self oldPush(x)))
+List push := method(x, if(x != nil, self oldPush(x), self))
 Sequence asBool := method(if(self asLowercase == "true", true, false))
 nil asString := ""
 true xor := method(x, if(x, false, true))
@@ -31,7 +31,7 @@ running := true
 rl := ReadLine
 
 // helper methods
-is_num := method(x, n := x asNumber; n isNan not and n asString == x)
+is_num := method(x, n := x asNumber; n isNan not and x at(x size - 1) - 48 <= 9)
 is_bool := method(x, x asLowercase == "true" or x asLowercase == "false")
 is_macro := method(x,x beginsWithSeq("##"))
 is_anonmacro := method(x, x beginsWithSeq("#(") and x endsWithSeq(")"))
@@ -49,27 +49,30 @@ initialize := method(
   builtins atPut("...", block(writeln(stack)))
   
   // stack manip
-  builtins atPut("dup", block(stack push(stack peek)))
+  builtins atPut("dup", block(if(stack size > 0, stack push(stack peek))))
   builtins atPut("cls", block(stack = list()))
-  builtins atPut("pop", block(stack pop))
-  builtins atPut("swap", block(a := stack pop; b := stack pop; stack push(a); stack push(b)))
-  builtins atPut("rot", block(a := stack pop; b := stack pop; c := stack pop; stack push(b); stack push(a); stack push(c)))
+  builtins atPut("pop", block(if(stack size > 0, stack pop)))
+  builtins atPut("swap", block(if(stack size > 1,a := stack pop; b := stack pop; stack push(a) push(b))))
+  builtins atPut("rot", block(if(stack size > 2, a := stack pop; b := stack pop; c := stack pop; stack push(b) push(a) push(c))))
   builtins atPut("-rot", block(run_input("rot rot")))
-  builtins atPut("over", block(stack push(stack at(stack size - 2))))
+  builtins atPut("over", block(if(stack size > 1, a := stack pop; b := stack pop; stack push(b) push(a) push(b))))
   builtins atPut("nip", block(run_input("swap pop")))
   builtins atPut("tuck", block(run_input("swap over")))
   builtins atPut("2dup", block(run_input("over over")))
   builtins atPut("2pop", block(run_input("pop pop")))
-  builtins atPut("2swap", block(
+  builtins atPut("2swap", block(if(stack size > 3,
     a := stack pop; b := stack pop; c := stack pop; d := stack pop
-    stack push(b); stack push(a); stack push(d); stack push(c)
-  ))
-  builtins atPut("2rot", block(
+    stack push(b) push(a) push(d) push(c)
+  )))
+  builtins atPut("2rot", block(if(stack size > 5,
     a := stack pop; b := stack pop; c := stack pop; d := stack pop; e := stack pop; f := stack pop
-    stack push(d); stack push(c); stack push(b); stack push(a); stack push(f); stack push(e)
-  ))
+    stack push(d) push(c)push(b) push(a) push(f) push(e)
+  )))
   builtins atPut("2-rot", block(run_input("2rot 2rot")))
-  builtins atPut("2over", block(2 repeat(stack push(stack at(stack size - 4)))))
+  builtins atPut("2over", block(if(stack size > 3,
+    a := stack pop; b := stack pop; c := stack pop; d := stack pop
+    stack push(d) push(c) push(b) push(a) push(d) push(c)
+  )))
   builtins atPut("2nip", block(run_input("2swap 2pop")))
   builtins atPut("2tuck", block(run_input("2swap 2over"))) 
   
@@ -226,7 +229,7 @@ run_input := method(input,
     )
   )
   if(anonmacro,
-    writeln("  >> ERROR: Unterminated anonymous macro.  Ignoring all input")
+    writeln("  >> ERROR: Unterminated anonymous macro.  Ignoring all input.")
     return
   )
   
@@ -246,14 +249,24 @@ run_input := method(input,
     )
   )
   if(quote,
-    writeln("  >> ERROR: Unterminated string literal.  Ignoring all input")
+    writeln("  >> ERROR: Unterminated string literal.  Ignoring all input.")
     return
   )
   
   if(DEBUG_OUTPUT, writeln("  DEBUG: ilist (string phase) = #{ilist}" interpolate))
   
   // run each word
-  ilist foreach(word, run(word))
+  cachestack := stack clone
+  ilist foreach(word, 
+    e := try(
+      run(word)
+    )
+    e catch(
+      writeln("  >> ERROR: Something went wrong.  Reverting stack to previous state.")
+      stack = cachestack
+      break
+    )
+  )
 )
 
 start := method(

@@ -127,7 +127,6 @@ BSD.  See [license/license.txt](https://raw.github.com/gatesphere/pila/master/li
 
 To do
 -----
-  * Catch exceptions/nil values
   * Standard library
   * Add hex, octal, binary support for numbers
   * Fix string parsing code
