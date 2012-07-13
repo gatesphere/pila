@@ -1,0 +1,19 @@
+// this is a test file.
+
+// figure out some math
+3 4 + 2 * 4 5 - + . pop
+
+// define a macro
+:helloworld "hello, world!" . pop
+
+// call a macro
+helloworld
+
+// push a macro reference
+##helloworld
+
+// call a macro reference
+call
+
+// print the stack
+...

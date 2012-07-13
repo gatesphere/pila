@@ -5,7 +5,7 @@
 // Jacob Peck
 
 // control variables
-DEBUG_OUTPUT := true
+DEBUG_OUTPUT := false
 VERSION := "20120712"
 
 // Override Io's behavior a bit
@@ -143,6 +143,17 @@ initialize := method(
       if(macros at(key) != true, writeln("#{key} := #{macros at(key)}" interpolate))
     )
   ))
+  builtins atPut("$import", block(
+    filename := unquote(stack pop)
+    e := try(
+      f := File with(filename) openForReading
+      f foreachLine (l, run_input(l))
+      f close
+    )
+    e catch(
+      writeln("  >> ERROR: Could not open file: #{filename}" interpolate)
+    )
+  ))
   
   // add reference to macros for faster lookup
   builtins keys foreach(key, macros atPut(key, true))
@@ -178,6 +189,7 @@ run := method(word,
 )
 
 run_input := method(input,
+  if(input == nil, return)
   if(DEBUG_OUTPUT, writeln("  DEBUG: stack = #{stack}" interpolate))
   // check for macro
   if(input beginsWithSeq(":"),
@@ -195,6 +207,7 @@ run_input := method(input,
   
   // discard comments
   input = input split("//") at(0)
+  if(input == nil, return)
   
   // selectively split (preserve anonmacros and strings)
   // ugly and broken

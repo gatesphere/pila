@@ -38,6 +38,21 @@ String manipulation can be neat too:
     [1]> $bye
     goodbye  
 
+Anonymous macros open up the possibilities for meta-programming.  Here's a particularly
+*bad* example:
+
+    :a #(:b a) call b
+
+About the name
+--------------
+"Pila" means "stack" or "pile" in Italian.  Unfortunately it's also Portuguese 
+slang for male anatomy.  I learned of this fact after I had already grown attached
+to the name, so I'm keeping it as "pila".  However, someone in #io suggested I 
+make the mascot an overly sexual rooster, and I might just have to do this.
+
+Ah well, learn from my mistakes.  Do more than a cursory Google search before
+you name a project.  Or not, the results could be hilarious.
+
 Documentation
 -------------
 **Concepts**
@@ -67,6 +82,9 @@ character strings (surrounded with `"` characters), and boolean values (`true` a
 pila is also smart when it comes to types: `+` and `*` change their behavior when
 appropriate to work on numbers and strings! 
 
+**Running pila**
+TBD.
+
 **Builtins**
 TBD.
 
@@ -92,11 +110,16 @@ TBD.
 TBD.
 
 **Script file support**
-TBD.
+You can run a file of valid pila words by placing it's relative path as a string
+on the stack, and then running the `$import` word.  Thanks to the ReadLine support,
+typing file names and paths are tab-completed on some systems.
 
 **Comments**
 Comments are delimited by `//`.  Anything to the right of `//` to the end of a line
-is discarded and ignored by the parser.
+is discarded and ignored by the parser.  This works both in the REPL and in script
+files.  You can use this as a way to add documentation to macros that will be 
+visible in the repl when using the `$macros` word, just be sure to keep your comments
+on the same line when doing this!
 
 License
 -------
@@ -105,7 +128,7 @@ BSD.  See [license/license.txt](https://raw.github.com/gatesphere/pila/master/li
 To do
 -----
   * Catch exceptions/nil values
-  * Add script file support. (std lib?)
+  * Standard library
   * Add hex, octal, binary support for numbers
   * Fix string parsing code
   * Clean it all up.
