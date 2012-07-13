@@ -100,9 +100,6 @@ TBD.
 **Anonymous macros**
 TBD.
 
-**Quoting a macro**
-TBD.
-
 **Recursion**
 TBD.
 

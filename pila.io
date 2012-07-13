@@ -33,11 +33,9 @@ rl := ReadLine
 // helper methods
 is_num := method(x, n := x asNumber; n isNan not and x at(x size - 1) - 48 <= 9)
 is_bool := method(x, x asLowercase == "true" or x asLowercase == "false")
-is_macro := method(x,x beginsWithSeq("##"))
 is_anonmacro := method(x, x beginsWithSeq("#(") and x endsWithSeq(")"))
 is_string := method(x, x beginsWithSeq("\"") and x endsWithSeq("\""))
 unquote := method(x, x exSlice(1, x size - 1))
-unmacro := method(x, x exSlice(2))
 unanonmacro := method(x, x exSlice(2, x size - 1))
 load_history := method(try(rl loadHistory(".pila_history")))
 save_history := method(try(rl saveHistory(".pila_history")))
@@ -180,8 +178,6 @@ run := method(word,
       stack push(word asNumber),
     is_bool(word),
       stack push(word asBool),
-    is_macro(word),
-      stack push(unmacro(word)),
     is_anonmacro(word),
       stack push(unanonmacro(word)),
     is_string(word),
