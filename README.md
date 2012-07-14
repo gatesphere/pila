@@ -145,7 +145,7 @@ Macro  | Code
 -------|-----
 .pop   | . pop
 !      | not
-\|     | or
+`|`    | or
 &      | and
 0=     | dup 0 =
 0<     | dup 0 <
@@ -180,17 +180,17 @@ can push the call to `hello` itself onto the stack by doing this:
     
 Printing the stack, we now see this:
 
-   [hello]<=
+    [hello]<=
 
 Meaning that the word `hello` has been pushed onto the stack.  This is useful for
 many things, including the branching word `if`, and the `call` word, which pops the
 top of the stack and attempts to execute it directly, such that
 
-   #(hello) call
+    #(hello) call
    
 Is functionally equivalent to
 
-   hello
+    hello
    
 in everything but semantics.
 
@@ -235,7 +235,9 @@ is the order of the day for looping.  Note: the standard library provides the `n
 macro, which will perform an action a specified number of times.
 
 **ReadLine support**
-TBD.
+On Io installations where ReadLine was compiled, the pila REPL has full ReadLine
+support.  This means that you can scroll through your history with your arrow
+keys.  The history file is saved as `.pila_history`
 
 **Script file support**
 You can run a file of valid pila words by placing it's relative path as a string
