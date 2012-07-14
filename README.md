@@ -138,19 +138,101 @@ $macros | Lists defined macros.
 $import | Pops the top item (n) from the stack and reads in the script file whose name is n.
 
 **Predefined macros (Standard Library)**
-TBD.
+The standard library has a number of macros available for your use.  You can load
+them into your environment by doing a `"lib/stdlib.pila" $import`.
+
+Macro  | Code
+-------|-----
+.pop   | . pop
+!      | not
+\|     | or
+&      | and
+0=     | dup 0 =
+0<     | dup 0 <
+0>     | dup 0 >
+avg    | + 2 /
+min    | 2dup < #(nip) #(pop) if
+max    | 2dup > #(nip) #(pop) if
+++     | 1 +
+--     | 1 -
+ntimes | 0> #(pop) #(over call 1 - ntimes) if
 
 **Defining macros**
-TBD.
+You can define a macro by prefacing it's name with a `:` character, and then 
+following it's name immediately by it's definition.  For example, here's a 
+macro (titled `hello`) that prints "Hello, world!" to the screen and then returns
+the stack to it's previous state:
+
+    :hello "Hello, world!" . pop
+    
+This macro will now be called whenever the word `hello` is encountered in the input.
 
 **Redefining macros**
-TBD.
+You can redefine a macro in the same manner as you defined it originally.  Note 
+that you will get a warning telling you that you have redefined the macro.
 
 **Anonymous macros**
-TBD.
+Anonymous macros allow you to push a body of code onto the stack directly, instead
+of pushing the literal elements.  Following the `hello` example from above, you 
+can push the call to `hello` itself onto the stack by doing this:
+
+    #(hello)
+    
+Printing the stack, we now see this:
+
+   [hello]<=
+
+Meaning that the word `hello` has been pushed onto the stack.  This is useful for
+many things, including the branching word `if`, and the `call` word, which pops the
+top of the stack and attempts to execute it directly, such that
+
+   #(hello) call
+   
+Is functionally equivalent to
+
+   hello
+   
+in everything but semantics.
+
+Anonymous macros can be used to push entire lines of input to the stack, too:
+
+    #(2 dup = . pop)
+    
+This will push the code `2 dup = . pop` to the stack as a *single element*,
+and that entire expression will be evaluated one word at a time when you do a
+`call` on it.
+
+Anonymous macros can also be nested:
+
+    #(1 2 3 #(- +))
+    
+Such that the first `call` will push `1`, `2`, and `3` to the stack, as well as
+the anonymous macro `+ -`, and the second `call` will evaluate this second macro.
+
+**Conditionals**
+Conditional execution is handled by the `if` word.  The `if` word expects at least
+3 items on the stack, in the following order from bottom to top:
+
+    [condition, else-branch, then-branch]
+    
+So, the `if` word will execute the `then-branch` of code if `condition` is equal
+to `true`, otherwise it will execute the `else-branch`.  Note, *both* branches
+are required, and both branches need to be executable, so they should be anonymous
+macros.  If you don't need an `else-branch` for your purpose, you should provide
+`#(nop)` as the `else-branch`, meaning "do nothing.".
+
+Here's an example:
+
+    3 1 > #("3 < 1!" . pop) #("3 > 1!" . pop) if
+    
+This will print "3 > 1!", as `3 1 >` evaluated to `true`, so the `then-branch`
+was executed.
 
 **Recursion**
-TBD.
+Recursion is done by writing macros which reference themselves, in the non-base 
+case of some if-branch.  There are no builtins for looping constructs, so recursion
+is the order of the day for looping.  Note: the standard library provides the `ntimes`
+macro, which will perform an action a specified number of times.
 
 **ReadLine support**
 TBD.
@@ -167,6 +249,19 @@ files.  You can use this as a way to add documentation to macros that will be
 visible in the repl when using the `$macros` word, just be sure to keep your comments
 on the same line when doing this!
 
+**Meta-programming**
+pila allows some limited meta-programming, via the fact that both macros and anonymous 
+macros are allowed to define new macros.  For example:
+
+    [0]> :macro1 #(:macro2 "I'm macro2, and I didn't exist when macro1 was called!" . pop) call
+    [0]> macro2
+      >> ERROR: Unknown word, ignoring: macro2
+    [0]> macro1
+    [0]> macro2
+    "I'm macro2, and I didn't exist when macro1 was called!"
+    
+You may be able to use this cleverly.
+
 License
 -------
 BSD.  See [license/license.txt](https://raw.github.com/gatesphere/pila/master/license/license.txt) for details.
@@ -177,5 +272,4 @@ To do
   * Add hex, octal, binary support for numbers
   * Fix string parsing code
   * Clean it all up.
-  * Documentation
   * File I/O?

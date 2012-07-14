@@ -1,5 +1,8 @@
 // pila standard lib
 
+// print and pop
+:.pop . pop
+
 // symbol aliases for builtins
 :! not
 :& and
