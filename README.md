@@ -144,9 +144,6 @@ them into your environment by doing a `"lib/stdlib.pila" $import`.
 Macro  | Code
 -------|-----
 .pop   | . pop
-!      | not
-`|`    | or
-&      | and
 0=     | dup 0 =
 0<     | dup 0 <
 0>     | dup 0 >
@@ -156,6 +153,9 @@ max    | 2dup > #(nip) #(pop) if
 ++     | 1 +
 --     | 1 -
 ntimes | 0> #(pop) #(over call 1 - ntimes) if
+
+The standard library also provides aliases for the `and`, `or`, and `not` words
+as `&`, `|`, and `!` respectively.
 
 **Defining macros**
 You can define a macro by prefacing it's name with a `:` character, and then 
