@@ -79,8 +79,19 @@ pila will work with numbers (integers and floating point, autoconverted on the f
 character strings (surrounded with `"` characters), and boolean values (`true` and
 `false`).
 
+pila supports 4 different bases for numbers, though they are all converted to decimal
+before being pushed onto the stack.  To use a number in base 2, 8, or 16, prefix it
+with the appropriate token:
+
+Base | Prefix
+-----|-------
+2    | 0b
+8    | 0o
+10   | (none)
+16   | 0x
+
 pila is also smart when it comes to types: `+` and `*` change their behavior when
-appropriate to work on numbers and strings! 
+appropriate to work on numbers and strings!
 
 **Running pila**
 pila is easy to run, but it requires [Io](http://iolanguage.com/).  To begin a pila session, simply do:
@@ -155,7 +166,8 @@ max    | 2dup > #(nip) #(pop) if
 ntimes | 0> #(pop) #(over call 1 - ntimes) if
 
 The standard library also provides aliases for the `and`, `or`, and `not` words
-as `&`, `|`, and `!` respectively.
+as `&`, `|`, and `!` respectively, as well as `drop` for `pop` and `.s` for `...`
+for those who are used to working with FORTH.
 
 **Defining macros**
 You can define a macro by prefacing it's name with a `:` character, and then 
@@ -271,7 +283,6 @@ BSD.  See [license/license.txt](https://raw.github.com/gatesphere/pila/master/li
 To do
 -----
   * Standard library
-  * Add hex, octal, binary support for numbers
   * Fix string parsing code
   * Clean it all up.
   * File I/O?

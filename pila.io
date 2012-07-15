@@ -1,12 +1,12 @@
 #!/usr/bin/env io
 
 // pila programming language
-// 20120711
+// 20120715
 // Jacob Peck
 
 // control variables
 DEBUG_OUTPUT := false
-VERSION := "20120713"
+VERSION := "20120715"
 
 // Override Io's behavior a bit
 List asString := method("[" .. self join(", ") .. "]<=")
@@ -31,6 +31,24 @@ running := true
 rl := ReadLine
 
 // helper methods
+is_hexnum := method(x, 
+  n := Number constants nan
+  e := try(n = x fromBase(16))
+  e catch(return false)
+  return n isNan not and x beginsWithSeq("0x")
+)
+is_binnum := method(x,
+  n := Number constants nan 
+  e := try(n = x exSlice(2) fromBase(2))
+  e catch(return false)
+  return n isNan not and x beginsWithSeq("0b")
+)
+is_octnum := method(x,
+    n := Number constants nan 
+  e := try(n = x exSlice(2) fromBase(8))
+  e catch(return false)
+  return n isNan not and x beginsWithSeq("0o")
+)
 is_num := method(x, n := x asNumber; n isNan not and x at(x size - 1) - 48 <= 9)
 is_bool := method(x, x asLowercase == "true" or x asLowercase == "false")
 is_anonmacro := method(x, x beginsWithSeq("#(") and x endsWithSeq(")"))
@@ -174,8 +192,14 @@ run := method(word,
   select(
     macros keys contains(word),
       if(macros at(word) == true, builtins at(word) call, run_input(macros at(word))),
+    is_binnum(word),
+      stack push(word exSlice(2) fromBase(2)),
+    is_octnum(word),
+      stack push(word exSlice(2) fromBase(8)),
     is_num(word),
       stack push(word asNumber),
+    is_hexnum(word),
+      stack push(word fromBase(16)),
     is_bool(word),
       stack push(word asBool),
     is_anonmacro(word),

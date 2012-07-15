@@ -3,6 +3,10 @@
 // print and pop
 :.pop . pop
 
+// forth names
+:drop pop
+:.s ...
+
 // symbol aliases for builtins
 :! not
 :& and
@@ -15,6 +19,8 @@
 
 // math
 :avg + 2 /
+:squared dup *
+:cubed dup dup * *
 :min 2dup < #(nip) #(pop) if
 :max 2dup > #(nip) #(pop) if
 :++ 1 +
