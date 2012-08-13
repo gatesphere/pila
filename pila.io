@@ -6,7 +6,7 @@
 
 // control variables
 DEBUG_OUTPUT := false
-VERSION := "20120715"
+VERSION := "20120813"
 
 // Override Io's behavior a bit
 List asString := method("[" .. self join(", ") .. "]<=")
@@ -137,16 +137,18 @@ initialize := method(
   
   // flow control
   builtins atPut("if", block(
-    then := stack pop
-    else := stack pop
-    if(DEBUG_OUTPUT, writeln("  DEBUG: if > then = #{then}" interpolate))
-    if(DEBUG_OUTPUT, writeln("  DEBUG: if > else = #{else}" interpolate))
-    if(stack pop,
-      if(DEBUG_OUTPUT, writeln("  DEBUG: if > taking then branch"))
-      run_input(then)
-      ,
-      if(DEBUG_OUTPUT, writeln("  DEBUG: if > taking else branch")) 
-      run_input(else)
+    if(stack size > 2,
+      then := stack pop
+      else := stack pop
+      if(DEBUG_OUTPUT, writeln("  DEBUG: if > then = #{then}" interpolate))
+      if(DEBUG_OUTPUT, writeln("  DEBUG: if > else = #{else}" interpolate))
+      if(stack pop,
+        if(DEBUG_OUTPUT, writeln("  DEBUG: if > taking then branch"))
+        run_input(then)
+        ,
+        if(DEBUG_OUTPUT, writeln("  DEBUG: if > taking else branch")) 
+        run_input(else)
+      )
     )
   ))
   
@@ -155,14 +157,14 @@ initialize := method(
   builtins atPut("call", block(run_input(stack pop))) 
   
   // meta 
-  builtins atPut("$bye", block(writeln("goodbye"); running = false))
-  builtins atPut("$macros", block(
+  builtins atPut("!bye", block(writeln("goodbye"); running = false))
+  builtins atPut("!macros", block(
     writeln("registered macros:")
     macros keys foreach(key,
       if(macros at(key) != true, writeln("#{key} := #{macros at(key)}" interpolate))
     )
   ))
-  builtins atPut("$import", block(
+  builtins atPut("!import", block(
     filename := unquote(stack pop)
     e := try(
       f := File with(filename) openForReading

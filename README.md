@@ -35,7 +35,7 @@ String manipulation can be neat too:
     ["foobar", "bazbazbaz"]<=
     [2]> + .
     "foobarbazbazbaz"
-    [1]> $bye
+    [1]> !bye
     goodbye  
 
 Anonymous macros open up the possibilities for meta-programming.  Here's a particularly
@@ -144,13 +144,13 @@ not     | Pops the top item (n) from the stack and pushes true if n == false, fa
 nop     | Does absolutely nothing (no operation).
 call    | Pops the top item from the stack and attempts to evaluates it as code.
 if      | Pops the top three items from the stack (c, t, e), and if c == true, evaluates t, otherwise evaluates e.
-$bye    | Exits the program.
-$macros | Lists defined macros.
-$import | Pops the top item (n) from the stack and reads in the script file whose name is n.
+!bye    | Exits the program.
+!macros | Lists defined macros.
+!import | Pops the top item (n) from the stack and reads in the script file whose name is n.
 
 **Predefined macros (Standard Library)**
 The standard library has a number of macros available for your use.  You can load
-them into your environment by doing a `"lib/stdlib.pila" $import`.
+them into your environment by doing a `"lib/stdlib.pila" !import`.
 
 Macro  | Code
 -------|-----
@@ -219,7 +219,7 @@ Anonymous macros can also be nested:
     #(1 2 3 #(- +))
     
 Such that the first `call` will push `1`, `2`, and `3` to the stack, as well as
-the anonymous macro `+ -`, and the second `call` will evaluate this second macro.
+the anonymous macro `- +`, and the second `call` will evaluate this second macro.
 
 **Conditionals**
 Conditional execution is handled by the `if` word.  The `if` word expects at least
@@ -253,14 +253,14 @@ keys.  The history file is saved as `.pila_history`
 
 **Script file support**
 You can run a file of valid pila words by placing it's relative path as a string
-on the stack, and then running the `$import` word.  Thanks to the ReadLine support,
+on the stack, and then running the `!import` word.  Thanks to the ReadLine support,
 typing file names and paths are tab-completed on some systems.
 
 **Comments**
 Comments are delimited by `//`.  Anything to the right of `//` to the end of a line
 is discarded and ignored by the parser.  This works both in the REPL and in script
 files.  You can use this as a way to add documentation to macros that will be 
-visible in the repl when using the `$macros` word, just be sure to keep your comments
+visible in the repl when using the `!macros` word, just be sure to keep your comments
 on the same line when doing this!
 
 **Meta-programming**
